@@ -224,6 +224,7 @@ public class ScriptRunner {
     statement.setEscapeProcessing(escapeProcessing);
     String sql = command;
     if (removeCRs) {
+      //  \r\n 和 \n  都可以达到换行的目的，但是和操作系统有关，  \r--mac  \n--unix linux  \r\n---windows
       sql = sql.replaceAll("\r\n", "\n");
     }
     if (stopOnError) {

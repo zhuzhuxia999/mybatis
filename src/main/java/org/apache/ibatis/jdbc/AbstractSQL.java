@@ -34,6 +34,7 @@ public abstract class AbstractSQL<T> {
   private static final String AND = ") \nAND (";
   private static final String OR = ") \nOR (";
 
+  //SQLStatement 是组装sql的内部类，这里先创建出来，用来给外部类调用使用
   private SQLStatement sql = new SQLStatement();
 
   public abstract T getSelf();
@@ -191,6 +192,7 @@ public abstract class AbstractSQL<T> {
   }
 
   //SQL语句
+  //加工拼接sql都在这个内部类中，然后外部类只是通过对这个内部类的调用组装sql.建造者模式
   private static class SQLStatement {
 
     //4种语句类型
