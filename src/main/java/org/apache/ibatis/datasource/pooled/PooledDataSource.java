@@ -501,7 +501,7 @@ public class PooledDataSource implements DataSource {
 
   /*
    * Method to check to see if a connection is still usable
-   *
+   *验证连接是否依然可用
    * @param conn - the connection to check
    * @return True if the connection is still usable
    */
@@ -556,7 +556,7 @@ public class PooledDataSource implements DataSource {
 
   /*
    * Unwraps a pooled connection to get to the 'real' connection
-   *
+   *解开一个池化包装后的连接，以得到‘真正的’的连接
    * @param conn - the pooled connection to unwrap
    * @return The 'real' connection
    */

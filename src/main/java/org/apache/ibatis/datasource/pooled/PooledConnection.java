@@ -44,11 +44,11 @@ class PooledConnection implements InvocationHandler {
   private long createdTimestamp;
   private long lastUsedTimestamp;
   private int connectionTypeCode;
-  private boolean valid;
+  private boolean valid;//确认，使有效的意思
 
   /*
    * Constructor for SimplePooledConnection that uses the Connection and PooledDataSource passed in
-   *
+   *简单的池化连接的构造器
    * @param connection - the connection that is to be presented as a pooled connection
    * @param dataSource - the dataSource that the connection is from
    */
@@ -64,6 +64,7 @@ class PooledConnection implements InvocationHandler {
 
   /*
    * Invalidates the connection
+   * 使连接无效
    */
   public void invalidate() {
     valid = false;
@@ -71,7 +72,7 @@ class PooledConnection implements InvocationHandler {
 
   /*
    * Method to see if the connection is usable
-   *
+   *验证连接是否可用
    * @return True if the connection is usable
    */
   public boolean isValid() {
