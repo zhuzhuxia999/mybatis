@@ -34,6 +34,7 @@ import org.apache.ibatis.logging.Log;
  */
 public abstract class BaseJdbcLogger {
 
+  //类内部定义全局变量，作为容器保存配置。这种写法感觉很清爽
   protected static final Set<String> SET_METHODS = new HashSet<String>();
   protected static final Set<String> EXECUTE_METHODS = new HashSet<String>();
 

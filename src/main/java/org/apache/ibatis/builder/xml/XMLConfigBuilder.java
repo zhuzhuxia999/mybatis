@@ -47,7 +47,7 @@ import org.apache.ibatis.type.JdbcType;
  */
 /**
  * XML配置构建器，建造者模式,继承BaseBuilder
- *
+ *针对不同的数据源，编写不同的构造方法，函数。
  */
 public class XMLConfigBuilder extends BaseBuilder {
 
@@ -58,6 +58,8 @@ public class XMLConfigBuilder extends BaseBuilder {
 
   //以下3个一组
   public XMLConfigBuilder(Reader reader) {
+    //这种是this的构造器建调用，一般是这样子用的.不同的构造器中存在相同代码.为了复用性。可以在参数少的构造器中调用参数多的构造器,如下:
+    //调用同名的构造器函数，参数不足，就使用参数的默认值补全
     this(reader, null, null);
   }
 
@@ -84,7 +86,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     this(new XPathParser(inputStream, true, props, new XMLMapperEntityResolver()), environment, props);
   }
 
-  //上面6个构造函数最后都合流到这个函数，传入XPathParser
+  //上面6个构造函数最后都合流到这个函数，传入XPathParser   parser 解析器
   private XMLConfigBuilder(XPathParser parser, String environment, Properties props) {
     //首先调用父类初始化Configuration
     super(new Configuration());
@@ -134,7 +136,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     try {
       //分步骤解析
       //issue #117 read properties first
-      //1.properties
+      //1.properties eval求值
       propertiesElement(root.evalNode("properties"));
       //2.类型别名
       typeAliasesElement(root.evalNode("typeAliases"));

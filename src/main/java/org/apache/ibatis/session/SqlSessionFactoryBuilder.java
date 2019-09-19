@@ -39,6 +39,7 @@ public class SqlSessionFactoryBuilder {
   //发现mybatis文档老了,http://www.mybatis.org/core/java-api.html,关于这块对不上
 
   //以下3个方法都是调用下面第4种方法
+  //竟然还可以有这种写法，仅仅是为了针对不同参数提供独立的函数调用吗？
   public SqlSessionFactory build(Reader reader) {
     return build(reader, null, null);
   }
