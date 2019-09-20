@@ -103,6 +103,7 @@ public class UnpooledDataSource implements DataSource {
     return doGetConnection(username, password);
   }
 
+  //涉及到很多对 JDK原生类DriverManager的直接操作，之前写代码我还没这样写过
   @Override
   public void setLoginTimeout(int loginTimeout) throws SQLException {
     DriverManager.setLoginTimeout(loginTimeout);
@@ -201,6 +202,7 @@ public class UnpooledDataSource implements DataSource {
     return doGetConnection(props);
   }
 
+  //获取连接的代码，但是最终还是交给了JDK来完成连接的建立
   private Connection doGetConnection(Properties properties) throws SQLException {
     initializeDriver();
     //属性的前缀是以“driver.”开 头的,它 是 通 过 DriverManager.getConnection(url,driverProperties)方法传递给数据库驱动
@@ -209,6 +211,7 @@ public class UnpooledDataSource implements DataSource {
     return connection;
   }
 
+  //加载驱动，还没写过这样的函数，对JDK源码的掌握还是太浅啦，要多读书啊
   private synchronized void initializeDriver() throws SQLException {
 	  //这里便是大家熟悉的初学JDBC时的那几句话了 Class.forName newInstance()
     if (!registeredDrivers.containsKey(driver)) {
