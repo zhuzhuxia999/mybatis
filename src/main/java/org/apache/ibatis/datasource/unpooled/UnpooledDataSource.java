@@ -37,6 +37,9 @@ import org.apache.ibatis.io.Resources;
  */
 /**
  * 没有池化的数据源
+ *
+ * 其实源码中很多的方法，都是对于变量的 get set 只不过根据参数列表的不同，重载了很多同名方法出来
+ * 这算不算编写框架的套路呢
  */
 public class UnpooledDataSource implements DataSource {
   
