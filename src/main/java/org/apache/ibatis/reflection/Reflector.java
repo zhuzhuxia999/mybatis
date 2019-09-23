@@ -119,12 +119,16 @@ public class Reflector {
     }
   }
 
+  //完成对 addGetMethod 和 getTypes 集合的填充
   private void addGetMethods(Class<?> cls) {
     Map<String, List<Method>> conflictingGetters = new HashMap<String, List<Method>>();
     //这里getter和setter都调用了getClassMethods，有点浪费效率了。不妨把addGetMethods,addSetMethods合并成一个方法叫addMethods
+    //conflictingGetters 集合的K是  属性名称，v是 属性名相应的 getter方法合集，因为子类可能覆盖父类的getter方法，
+    // 所以同一个属性名可能存在多个getter方法
     Method[] methods = getClassMethods(cls);
     for (Method method : methods) {
       String name = method.getName();
+      //将getter方法查找出来，记录在集合中
       if (name.startsWith("get") && name.length() > 3) {
         if (method.getParameterTypes().length == 0) {
           name = PropertyNamer.methodToProperty(name);
@@ -140,16 +144,25 @@ public class Reflector {
     resolveGetterConflicts(conflictingGetters);
   }
 
+
+  //主要是处理 子类覆盖父类中的同名方法，但是返回值不同的情况
+  //例如  父类的返回值是 List  子类的返回值是 ArrayList 这种在生成签名的时候会生成不一样的签名，但是我们认为这是同一个返回值
+  //在这里进行处理
   private void resolveGetterConflicts(Map<String, List<Method>> conflictingGetters) {
+    //遍历map集合  propName 是属性名，List<Method>>是针对同一属性名的不同方法，重载或者重写的方法
     for (String propName : conflictingGetters.keySet()) {
       List<Method> getters = conflictingGetters.get(propName);
       Iterator<Method> iterator = getters.iterator();
       Method firstMethod = iterator.next();
+      //对于该属性只有一个方法时，当然没什么需要处理的
       if (getters.size() == 1) {
         addGetMethod(propName, firstMethod);
       } else {
-        Method getter = firstMethod;
-        Class<?> getterType = firstMethod.getReturnType();
+        //当对于同一属性，有多个getter方法时候，则需要依次比较这些方法中的返回值
+        //以下两个变量用于迭代中的中间变量，在 if条件符合的时候传递值
+        Method getter = firstMethod;//最适合作为getter方法的method
+        Class<?> getterType = firstMethod.getReturnType();//当前属性最适合的返回值类型
+        //map中的value,也就是list集合，遍历该list集合
         while (iterator.hasNext()) {
           Method method = iterator.next();
           Class<?> methodType = method.getReturnType();
@@ -174,7 +187,9 @@ public class Reflector {
   }
 
   private void addGetMethod(String name, Method method) {
+    //判断属性名是否合法
     if (isValidPropertyName(name)) {
+      //填充 getMethods getTypes 集合
       getMethods.put(name, new MethodInvoker(method));
       getTypes.put(name, method.getReturnType());
     }
@@ -289,6 +304,7 @@ public class Reflector {
     }
   }
 
+  //判断属性名是否合法，竟然是通过属性名的字符串规则进行验证的
   private boolean isValidPropertyName(String name) {
     return !(name.startsWith("$") || "serialVersionUID".equals(name) || "class".equals(name));
   }
@@ -337,6 +353,7 @@ public class Reflector {
         // check to see if the method is already known
         // if it is known, then an extended class must have
         // overridden a method
+        //检查当前类中是否已经包含该，如果有的话，证明子类覆盖了父类中的方法。那么父类的该方法无需再次添加
         if (!uniqueMethods.containsKey(signature)) {
           if (canAccessPrivateMethods()) {
             try {
@@ -345,13 +362,17 @@ public class Reflector {
               // Ignored. This is only a final precaution, nothing we can do.
             }
           }
-
+          //将获得签名和方法一同存入map,建立映射关系
           uniqueMethods.put(signature, currentMethod);
         }
       }
     }
   }
 
+  //生成方法的签名，其实就是将获取的属性拼接字符串返回
+  //格式为：返回值类型#方法名：参数名，参数名，参数名
+  //实例    String#getXXX:参数1，参数2
+  //这样得到的方法签名是全局唯一的
   private String getSignature(Method method) {
     StringBuilder sb = new StringBuilder();
     Class<?> returnType = method.getReturnType();
