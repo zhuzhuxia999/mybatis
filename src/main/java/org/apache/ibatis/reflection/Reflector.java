@@ -47,6 +47,9 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
  * 反射器, 属性->getter/setter的映射器，而且加了缓存
  * 可参考ReflectorTest来理解这个类的用处
  *
+ *
+ * Reflector类是 整个反射模块的基础，每一个 reflector对象都对应一个类，在 reflector中缓存了反射操作需要使用的类的元信息
+ *
  */
 public class Reflector {
 
@@ -57,8 +60,10 @@ public class Reflector {
 
   private Class<?> type;
   //getter的属性列表
+  //可读属性的名称集合，可读属性就是存在相对应的getter方法的属性，初始值为空数组
   private String[] readablePropertyNames = EMPTY_STRING_ARRAY;
   //setter的属性列表
+  //可写属性的名称集合，可写属性就是存在相对应的setter方法的属性，初始值为空数组
   private String[] writeablePropertyNames = EMPTY_STRING_ARRAY;
   //setter的方法列表
   private Map<String, Invoker> setMethods = new HashMap<String, Invoker>();
@@ -70,7 +75,7 @@ public class Reflector {
   private Map<String, Class<?>> getTypes = new HashMap<String, Class<?>>();
   //构造函数
   private Constructor<?> defaultConstructor;
-
+  //记录了所有属性名称的集合
   private Map<String, String> caseInsensitivePropertyMap = new HashMap<String, String>();
 
   private Reflector(Class<?> clazz) {
@@ -78,13 +83,15 @@ public class Reflector {
     //加入构造函数
     addDefaultConstructor(clazz);
     //加入getter
-    addGetMethods(clazz);
+    addGetMethods(clazz);//处理clazz中的getter方法，填充getterMethods集合和getTypes集合
     //加入setter
-    addSetMethods(clazz);
+    addSetMethods(clazz);//处理clazz中的setter方法，填充setterMethods集合和getTypes集合
     //加入字段
     addFields(clazz);
+    //根据getMethods/setmethods 集合，初始化 可读、可写属性的名称集合
     readablePropertyNames = getMethods.keySet().toArray(new String[getMethods.keySet().size()]);
     writeablePropertyNames = setMethods.keySet().toArray(new String[setMethods.keySet().size()]);
+    //初始化 caseInsensitivePropertyMap 集合，其中记录了所有大写格式的属性名称
     for (String propName : readablePropertyNames) {
         //这里为了能找到某一个属性，就把他变成大写作为map的key。。。
       caseInsensitivePropertyMap.put(propName.toUpperCase(Locale.ENGLISH), propName);
@@ -292,33 +299,38 @@ public class Reflector {
    * We use this method, instead of the simpler Class.getMethods(),
    * because we want to look for private methods as well.
    * 得到所有方法，包括private方法，包括父类方法.包括接口方法
-   *
+   *获取当前类以及其父类中定义的所有方法的唯一签名以及相对应的method对象
    * @param cls The class
    * @return An array containing all methods in this class
    */
   private Method[] getClassMethods(Class<?> cls) {
     Map<String, Method> uniqueMethods = new HashMap<String, Method>();
     Class<?> currentClass = cls;
+    //不停向上获取父类
     while (currentClass != null) {
+      //记录当前拿到的类中声明的全部方法
       addUniqueMethods(uniqueMethods, currentClass.getDeclaredMethods());
 
       // we also need to look for interface methods - 
       // because the class may be abstract
+      //记录类中的全部接口
       Class<?>[] interfaces = currentClass.getInterfaces();
       for (Class<?> anInterface : interfaces) {
         addUniqueMethods(uniqueMethods, anInterface.getMethods());
       }
 
-      currentClass = currentClass.getSuperclass();
+      currentClass = currentClass.getSuperclass();//向上获取父类，将父类赋值给当前对象，继续循环
     }
 
     Collection<Method> methods = uniqueMethods.values();
-
+    //转换成数组返回
     return methods.toArray(new Method[methods.size()]);
   }
 
+  //这里会对每一个方法方法生成唯一签名
   private void addUniqueMethods(Map<String, Method> uniqueMethods, Method[] methods) {
     for (Method currentMethod : methods) {
+      //判断当前方法是不是桥接方法
       if (!currentMethod.isBridge()) {
           //取得签名
         String signature = getSignature(currentMethod);

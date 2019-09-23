@@ -16,5 +16,7 @@
 
 /**
  * Reflection utils.
+ *
+ * mybtis提供了对jdk中反射的封装，reflection 目录下主要就是对于反射的处理
  */
 package org.apache.ibatis.reflection;
