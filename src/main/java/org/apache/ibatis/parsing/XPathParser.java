@@ -44,15 +44,15 @@ import org.xml.sax.SAXParseException;
  */
 /**
  * XPath解析器，用的都是JDK的类包,封装了一下，使得使用起来更方便
- *
+ *封装 Document EntityResolver XPath 对象
  */
 public class XPathParser {
 
-  private Document document;
-  private boolean validation;
-  private EntityResolver entityResolver;
-  private Properties variables;
-  private XPath xpath;
+  private Document document;//文档对象，是JDK中对xpath的定义
+  private boolean validation;//是否开启验证
+  private EntityResolver entityResolver;//用于加载本地DTD文件
+  private Properties variables;//mybatis-config.xml 中<properties>标签定义的键值对集合
+  private XPath xpath;//JDK定义的xpath对象
 
 	//一些构造函数,全部调用commonConstructor以及createDocument
 	//1~4,默认不需要验证
