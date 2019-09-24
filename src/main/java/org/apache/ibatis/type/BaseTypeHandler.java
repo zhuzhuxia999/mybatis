@@ -28,6 +28,7 @@ import org.apache.ibatis.session.Configuration;
  */
 /**
  * 类型处理器的基类
+ * 这是提供出来专门给用户定义自己的 TypaHander实现的
  * 
  */
 public abstract class BaseTypeHandler<T> extends TypeReference<T> implements TypeHandler<T> {

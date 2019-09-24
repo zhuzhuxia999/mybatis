@@ -27,7 +27,9 @@ import java.net.URL;
 public class ClassLoaderWrapper {
 
   //defaultClassLoader没地方初始化啊?
+  // 默认类加载器
   ClassLoader defaultClassLoader;
+  //系统类加载器
   ClassLoader systemClassLoader;
 
   ClassLoaderWrapper() {
@@ -40,7 +42,7 @@ public class ClassLoaderWrapper {
   
   /*
    * Get a resource as a URL using the current class path
-   *
+   * 通过path路径获取 资源
    * @param resource - the resource to locate
    * @return the resource or null
    */

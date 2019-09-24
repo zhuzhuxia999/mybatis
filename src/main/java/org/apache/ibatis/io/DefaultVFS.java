@@ -44,6 +44,7 @@ public class DefaultVFS extends VFS {
   private static final Log log = LogFactory.getLog(ResolverUtil.class);
 
   /** The magic header that indicates a JAR (ZIP) file. */
+  //能够表示一个 jar包的特征词数组
   private static final byte[] JAR_MAGIC = { 'P', 'K', 3, 4 };
 
   @Override
@@ -51,6 +52,7 @@ public class DefaultVFS extends VFS {
     return true;
   }
 
+  //这个方法主要是通过 JarInputStream 读取路径下（url）下的jar包资源，放在集合中返回
   @Override
   public List<String> list(URL url, String path) throws IOException {
     InputStream is = null;
@@ -90,6 +92,7 @@ public class DefaultVFS extends VFS {
              * the class loader as a child of the current resource. If any line fails
              * then we assume the current resource is not a directory.
              */
+            //对于一些定义在文本中的url路径，只能逐行读取，最后并入 数组中返回
             is = url.openStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             List<String> lines = new ArrayList<String>();
@@ -286,7 +289,7 @@ public class DefaultVFS extends VFS {
 
   /**
    * Returns true if the resource located at the given URL is a JAR file.
-   * 
+   * 验证给定的url是否表示一个jar包文件
    * @param url The URL of the resource to test.
    * @param buffer A buffer into which the first few bytes of the resource are read. The buffer
    *            must be at least the size of {@link #JAR_MAGIC}. (The same buffer may be reused

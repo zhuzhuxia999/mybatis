@@ -261,8 +261,10 @@ public class Reflector {
   }
 
   private void addFields(Class<?> clazz) {
+    //获取类中生命的全部字段
     Field[] fields = clazz.getDeclaredFields();
     for (Field field : fields) {
+      //进行安全检查
       if (canAccessPrivateMethods()) {
         try {
           field.setAccessible(true);
@@ -276,7 +278,9 @@ public class Reflector {
           // modification of final fields through reflection (JSR-133). (JGB)
           // pr #16 - final static can only be set by the classloader
           int modifiers = field.getModifiers();
+          //过滤掉被 final 和 static 同时修饰的字段
           if (!(Modifier.isFinal(modifiers) && Modifier.isStatic(modifiers))) {
+            //填充 addSetField 集合
             addSetField(field);
           }
         }
@@ -286,6 +290,7 @@ public class Reflector {
       }
     }
     if (clazz.getSuperclass() != null) {
+      //递归，向上处理父类中的字段
       addFields(clazz.getSuperclass());
     }
   }

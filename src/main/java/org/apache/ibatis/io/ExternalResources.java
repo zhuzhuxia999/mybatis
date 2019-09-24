@@ -60,11 +60,13 @@ public class ExternalResources {
         closeable.close();
       } catch (IOException e) {
         // do nothing, close quietly
+        //好吧 我可以理解为静悄悄的关闭，日志都不留的意思吗 哈哈
       }
     }
   }
 
   //读取property
+  //从对应路径 templatePath 下读取 想要（templateProperty）的属性
   public static String getConfiguredTemplate(String templatePath, String templateProperty) throws FileNotFoundException {
     String templateName = "";
     Properties migrationProperties = new Properties();

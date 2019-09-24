@@ -22,7 +22,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 /**
  * 调用者
- * 
+ * 实现了 这个接口的三个类分别是从 get set method三个方向对外提供api,具体实现也是对jdK invoker的简单封装
  */
 public interface Invoker {
   //调用

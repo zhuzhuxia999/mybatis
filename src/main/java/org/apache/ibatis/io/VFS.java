@@ -45,12 +45,14 @@ public abstract class VFS {
   public static final List<Class<? extends VFS>> USER_IMPLEMENTATIONS = new ArrayList<Class<? extends VFS>>();
 
   /** Singleton instance. */
+  //单例模式
   private static VFS instance;
 
   /**
    * Get the singleton {@link VFS} instance. If no {@link VFS} implementation can be found for the
    * current environment, then this method returns null.
    */
+  //获取VFS实例，系统有的话，返回，没有的话，直接返回null
   @SuppressWarnings("unchecked")
   public static VFS getInstance() {
     if (instance != null) {
@@ -59,6 +61,7 @@ public abstract class VFS {
 
     // Try the user implementations first, then the built-ins
     List<Class<? extends VFS>> impls = new ArrayList<Class<? extends VFS>>();
+    //将两个vfs数组组装起来一起遍历，挨个看是否能 new出vfs实例
     impls.addAll(USER_IMPLEMENTATIONS);
     impls.addAll(Arrays.asList((Class<? extends VFS>[]) IMPLEMENTATIONS));
 
@@ -90,7 +93,7 @@ public abstract class VFS {
   /**
    * Adds the specified class to the list of {@link VFS} implementations. Classes added in this
    * manner are tried in the order they are added and before any of the built-in implementations.
-   * 
+   * 添加实现类进入集合中，便于之后对 USER_IMPLEMENTATIONS 的处理
    * @param clazz The {@link VFS} implementation class to add.
    */
   public static void addImplClass(Class<? extends VFS> clazz) {
@@ -100,6 +103,7 @@ public abstract class VFS {
   }
 
   /** Get a class by name. If the class is not found then return null. */
+  //根据classname加载类
   protected static Class<?> getClass(String className) {
     try {
       return Thread.currentThread().getContextClassLoader().loadClass(className);
